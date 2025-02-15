@@ -1,0 +1,70 @@
+{
+  "userProfile": {
+    "userEmail": "vignesh@primeinvestor.in",
+    "userName": "Vigneshwaran Jegadeeswaran",
+    "userImage": null
+  },
+  "userKyc": {
+    "status": true,
+    "pan": "APZPV6528E",
+    "full_name": "Vigneshwaran Jegadeeswaran",
+    "phone": "9629795854",
+    "email": "VICKYVIGNESHWARAN9@GMAIL.COM",
+    "full_address_parts": "S O JEGADEESHWARAN NO 22 A1 D BLOCK, ACUIR MARIGOLD APPARTMENT MORSSION, 5TH STREET ALANDUR ACUIR MARIGOLD, Kancheepuram, TN, 600016, IN"
+  },
+
+  "userSubscription": {
+    "userType": 3,
+    "status": "Expired Trial",
+    "planInfo": "Your trail expired on 14th Feb 2025",
+    "textlabelone": "Our subscription plan types & billing periods have changed",
+    "textlabeltwo": "Please select your preferred billing option from our current offerings",
+    "buttonText": "Choose plan",
+    "buttonUrl": "https://staging.primeinvestor.in/prime-pricing"
+    },        
+  "billingHistory": {
+    "0": {
+      "id": "<a href=/my-account/view-order/198230/>198230</a>",
+      "orderDate": "12-02-2025",
+      "orderitem": "Test Subscription - Growth",
+      "orderTotal": "472"
+    },
+    "1": {
+      "id": "<a href=/my-account/view-order/198199/>198199</a>",
+      "orderDate": "11-02-2025",
+      "orderitem": "Primeinvestor Subscription - Monthly",
+      "orderTotal": "0"
+    },
+    "2": {
+      "id": "<a href=/my-account/view-order/198165/>198165</a>",
+      "orderDate": "11-02-2025",
+      "orderitem": "Test Subscription - Growth",
+      "orderTotal": "0"
+    },
+    "3": {
+      "id": "<a href=/my-account/view-order/198110/>198110</a>",
+      "orderDate": "05-02-2025",
+      "orderitem": "Test Subscription - Growth",
+      "orderTotal": "0"
+    },
+    "4": {
+      "id": "<a href=/my-account/view-order/198071/>198071</a>",
+      "orderDate": "04-02-2025",
+      "orderitem": "Test Subscription - Growth",
+      "orderTotal": "0"
+    },
+    "5": {
+      "id": "<a href=/my-account/view-order/198041/>198041</a>",
+      "orderDate": "03-02-2025",
+      "orderitem": "Test Subscription - Growth",
+      "orderTotal": "0"
+    }
+  },
+  "autoPay": {
+    "status": true,
+    "method": "card",
+    "card": "4242",
+    "newtowrk": "VISA",
+    "upi": ""
+  }
+}
