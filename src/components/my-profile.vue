@@ -8,6 +8,7 @@
             alt="Profile Picture"
             class="dashboard-avatar-img"
           />
+
           <span class="edit-icon">
             <img src="@/assets/images/edit.svg" alt="Edit" />
           </span>
@@ -66,7 +67,7 @@ import { ref, computed, inject } from "vue";
 
 export default {
   setup() {
-    const profileImage = ref(require("@/assets/images/avatar.png"));
+    const profileImage = ref(require("@/assets/images/Profile.jpg"));
     const userProfile = inject("userProfile");
     const userName = computed(() => userProfile.value?.userName || "");
     const userEmail = computed(() => userProfile.value?.userEmail || "");
@@ -82,6 +83,7 @@ export default {
       tempName.value = userName.value;
       showNameDialog.value = true;
     };
+
     const closeNameDialog = () => {
       showNameDialog.value = false;
     };
