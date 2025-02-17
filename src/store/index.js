@@ -8,6 +8,7 @@ export default createStore({
     userSubscription: null,
     billingHistory: null,
     autoPay: null,
+    subscriptionMessage: null,
   },
   mutations: {
     SET_USER_DATA(state, data) {
@@ -20,6 +21,9 @@ export default createStore({
       } else {
         console.warn("SET_USER_DATA received invalid data:", data);
       }
+    },
+    SET_SUBSCRIPTION_MESSAGE(state, message) {
+      state.subscriptionMessage = message;
     },
   },
   actions: {
@@ -49,15 +53,15 @@ export default createStore({
     userSubscription: (state) => state.userSubscription,
     billingHistory: (state) => state.billingHistory,
     autoPay: (state) => state.autoPay,
+    subscriptionMessage: (state) => state.subscriptionMessage,
   },
 });
 
-// Helper function to fetch local JSON data
 async function fetchLocalUserData(commit) {
   try {
-    const localResponse = await axios.get("/data/data.json"); // Fetch from public directory
+    const localResponse = await axios.get("/data/data.json"); 
 
-    console.log("Local JSON Response:", localResponse.data); // Debugging
+    console.log("Local JSON Response:", localResponse.data); 
 
     if (localResponse.data && Object.keys(localResponse.data).length) {
       commit("SET_USER_DATA", localResponse.data);

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <b-container fluid>
-      <h1>My Account</h1>
+      <h3>My Account</h3>
       <b-row class="mb-3">
         <b-col cols="12" md="8" lg="6">
           <profileName />

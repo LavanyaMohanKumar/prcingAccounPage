@@ -3,7 +3,7 @@
     <div class="subscription-header">
       <h3>Subscription</h3>
       <div class="status-row">
-        <span class="fw-bold">Status</span>
+        <span>Status</span>
         <span
           :class="{
             'green-bg':
@@ -20,6 +20,7 @@
       </div>
     </div>
     <div class="subscription-footer" v-if="subscriptionData.userType === 0">
+      <p v-if="subscriptionMessage">{{ subscriptionMessage }}</p>
       <p
         v-if="subscriptionData.planInfo"
         class="fw-bold"
@@ -54,6 +55,7 @@
       class="subscription-footer"
       v-else-if="subscriptionData.userType === 1"
     >
+      <p v-if="subscriptionMessage">{{ subscriptionMessage }}</p>
       <p
         v-if="subscriptionData.planInfo"
         class="fw-bold"
@@ -85,6 +87,7 @@
       </div>
     </div>
     <div class="subscription-footer" v-if="subscriptionData.userType === 2">
+      <p v-if="subscriptionMessage">{{ subscriptionMessage }}</p>
       <p v-if="subscriptionData.planInfo" class="fw-bold">
         {{ subscriptionData.planInfo }}
       </p>
@@ -104,6 +107,7 @@
       </b-button>
     </div>
     <div class="subscription-footer" v-if="subscriptionData.userType === 3">
+      <p v-if="subscriptionMessage">{{ subscriptionMessage }}</p>
       <p v-if="subscriptionData.planInfo" class="fw-bold">
         {{ subscriptionData.planInfo }}
       </p>
@@ -123,6 +127,7 @@
       </b-button>
     </div>
     <div class="subscription-footer" v-if="subscriptionData.userType === 4">
+      <p v-if="subscriptionMessage">{{ subscriptionMessage }}</p>
       <p v-if="subscriptionData.planInfo">
         <img
           src="@/assets/images/creditcard.svg"
@@ -137,6 +142,7 @@
       </p>
     </div>
     <div class="subscription-footer" v-if="subscriptionData.userType === 5">
+      <p v-if="subscriptionMessage">{{ subscriptionMessage }}</p>
       <p v-if="subscriptionData.planInfo">
         <img
           src="@/assets/images/creditcard.svg"
@@ -150,11 +156,34 @@
         {{ subscriptionData.nextPay }}
       </p>
     </div>
+    <div class="subscription-footer" v-if="subscriptionData.userType === 6">
+      <p v-if="subscriptionMessage">{{ subscriptionMessage }}</p>
+      <p v-if="subscriptionData.planInfo">
+        <img
+          src="@/assets/images/creditcard.svg"
+          alt="creditcard"
+          class="icon"
+        />
+        {{ subscriptionData.planInfo }}
+      </p>
+      <p v-if="subscriptionData.nextPay">
+        <img src="@/assets/images/calendar.svg" alt="calender" class="icon" />
+        {{ subscriptionData.nextPay }}
+      </p>
+      <b-button
+        @click="openLink"
+        class="plan-button"
+        v-if="subscriptionData.buttonText"
+      >
+        {{ subscriptionData.buttonText }}
+      </b-button>
+    </div>
   </div>
 </template>
 
 <script>
 import { computed, inject } from "vue";
+import { useStore } from "vuex";
 
 export default {
   name: "SubscriptionCard",
@@ -168,9 +197,14 @@ export default {
         console.warn("No URL found in subscriptionData.buttonUrl");
       }
     };
+    const store = useStore();
+    const subscriptionMessage = computed(
+      () => store.getters.subscriptionMessage
+    );
     return {
       subscriptionData,
       openLink,
+      subscriptionMessage,
     };
   },
 };

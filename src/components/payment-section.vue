@@ -8,9 +8,9 @@
     </div>
 
     <div class="info-row">
-      <span class="text-gray-500">
+      <small class="text-gray-500">
         You will be intimated 24Hrs prior to debit
-      </span>
+      </small>
       <a
         @click="toggleCardDetails"
         class="cursor-pointer text-decoration-none text-black"

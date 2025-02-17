@@ -165,6 +165,7 @@
 </template>
 
 <script>
+import { useStore } from "vuex";
 export default {
   data() {
     return {
@@ -177,7 +178,12 @@ export default {
       showReasonPopup: false,
       selectedReason: null,
       otherReasonText: null,
+      successMessage: null,
     };
+  },
+  setup() {
+    const store = useStore();
+    return { store };
   },
   methods: {
     toggleSubscription() {
@@ -237,6 +243,10 @@ export default {
       if (data.success) {
         alert(data.data);
         this.closeReasonPopup();
+        setTimeout(() => {
+          this.store.commit("SET_SUBSCRIPTION_MESSAGE", data.data);
+          alert(data.data);
+        }, 500);
       } else {
         alert("Error: " + data.data);
       }
