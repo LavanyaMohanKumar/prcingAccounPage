@@ -11,12 +11,12 @@
       <span class="text-gray-500">
         You will be intimated 24Hrs prior to debit
       </span>
-      <button
+      <a
         @click="toggleCardDetails"
-        class="ml-auto text-blue-600 hover:underline"
+        class="cursor-pointer text-decoration-none text-black"
       >
         Manage payment
-      </button>
+      </a>
     </div>
 
     <div v-if="showCardDetails" class="flex bg-gray-50 payment-cardAlign">
@@ -35,39 +35,35 @@
 </template>
 
 <script>
-import { computed, ref } from "vue";
-import { useStore } from "vuex";
+import { computed, inject, ref } from "vue";
 
 export default {
   setup() {
-    const store = useStore();
+    const autoPay = inject("autoPay");
     const showCardDetails = ref(false);
-    const autoPay = computed(() => store.state.autoPay || {});
-    const isAutoPayEnabled = computed(() => autoPay.value.status);
+    const isAutoPayEnabled = computed(() => autoPay.value?.status);
     const paymentMethod = computed(() => {
-      if (autoPay.value.method === "card") {
-        return autoPay.value.network
-          ? autoPay.value.network.toUpperCase()
+      if (autoPay.value?.method === "card") {
+        return autoPay.value?.network
+          ? autoPay.value?.network.toUpperCase()
           : "CARD";
-      } else if (autoPay.value.method === "upi") {
+      } else if (autoPay.value?.method === "upi") {
         return "UPI";
       }
       return "N/A";
     });
     const maskedPaymentInfo = computed(() => {
-      if (autoPay.value.method === "upi") {
-        return autoPay.value.upi || "Not Available";
-      } else if (autoPay.value.method === "card") {
-        const cardLast4 = autoPay.value.card || "XXXX";
+      if (autoPay.value?.method === "upi") {
+        return autoPay.value?.upi || "Not Available";
+      } else if (autoPay.value?.method === "card") {
+        const cardLast4 = autoPay.value?.card || "XXXX";
         return `XXXX XXXX XXXX ${cardLast4}`;
       }
       return "Not Available";
     });
-
     const toggleCardDetails = () => {
       showCardDetails.value = !showCardDetails.value;
     };
-
     return {
       showCardDetails,
       toggleCardDetails,

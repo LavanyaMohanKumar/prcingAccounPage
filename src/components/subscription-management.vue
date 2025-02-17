@@ -9,7 +9,7 @@
 
     <div v-if="isOpen" class="subscription-details">
       <p class="title">What would you like to do today</p>
-      <ul>
+      <ul class="ml-auto">
         <li class="link-contact-font">
           <a href="#" class="link" @click="openBillingPopup"
             >Change my billing period</a
@@ -73,7 +73,12 @@
       </div>
     </div>
 
-    <el-dialog v-model="showInitialPopup" width="300" center>
+    <el-dialog
+      v-model="showInitialPopup"
+      width="300"
+      center
+      class="custom-close-btn"
+    >
       <h3 class="popup-title">Are you sure?</h3>
       <p class="text-center">
         You’ll lose access to our platform & all new recommendations after 25
@@ -85,7 +90,12 @@
       </div>
     </el-dialog>
 
-    <el-dialog v-model="showReasonPopup" width="350" center>
+    <el-dialog
+      v-model="showReasonPopup"
+      width="350"
+      center
+      class="custom-close-btn"
+    >
       <div class="popup-cancel-subscription">
         <h4>We're sorry to see you go</h4>
         <p style="color: #00a3d9">Please give us your 10-second feedback</p>
@@ -122,7 +132,7 @@
           ></textarea>
         </div>
 
-        <div class="cancel-popup">
+        <div class="cancel-popup mt-3">
           <button @click="cancelSubscription" class="btn btn-custom text-white">
             Cancel Subscription
           </button>
@@ -189,17 +199,47 @@ export default {
     closeReasonPopup() {
       this.showReasonPopup = false;
     },
+    async cancelSubscription() {
+      if (!this.selectedReason) {
+        alert("Please select a reason for cancellation.");
+        return;
+      }
+
+      const cancelReason =
+        this.selectedReason === "others"
+          ? this.otherReasonText
+          : this.selectedReason;
+
+      try {
+        const response = await fetch(
+          "https://staging.primeinvestor.in/wp-admin/admin-ajax.php?action=cancelSubscription",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ cancel_reason: cancelReason }),
+          }
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert(data.data); // Show success message
+          this.closeReasonPopup(); // Close the popup
+        } else {
+          alert("Error: " + data.data); // Show error message
+        }
+      } catch (error) {
+        console.error("Error cancelling subscription:", error);
+        alert("Something went wrong. Please try again.");
+      }
+    },
   },
 };
 </script>
 
 <style scoped>
-.text-center {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-
 .toggle-button {
   background: none;
   border: none;
@@ -279,9 +319,16 @@ ul {
 }
 
 .close-button {
-  background: none;
-  border: none;
   font-size: 20px;
+  color: black;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  color: black;
+  background: none;
   cursor: pointer;
 }
 
@@ -369,6 +416,10 @@ input[type="radio"] {
   flex-direction: column;
   gap: 10px;
   margin-top: 15px;
+  background: #f2f2f2;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
+  padding: 14px;
 }
 
 .popup-buttons {
@@ -419,5 +470,13 @@ input[type="radio"] {
 .btn-custom {
   border-color: #dd2e44 !important;
   color: #dd2e44 !important;
+}
+
+::v-deep(.custom-close-btn .el-dialog__headerbtn) {
+  background-color: transparent;
+}
+
+::v-deep(.custom-close-btn .el-dialog__headerbtn:hover) {
+  background-color: transparent;
 }
 </style>

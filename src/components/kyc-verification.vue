@@ -28,20 +28,22 @@
 </template>
 
 <script>
-import { computed, ref } from "vue";
-import { useStore } from "vuex";
+import { computed, ref, inject } from "vue";
 
 export default {
   setup() {
-    const store = useStore();
+    const userKyc = inject("userKyc", {});
+
     const showDetails = ref(false);
+
     const kycStatus = computed(() =>
-      store.state.userKyc?.status ? "Verified" : "Pending"
+      userKyc.value?.status ? "Verified" : "Pending"
     );
-    const userKyc = computed(() => store.state.userKyc || {});
+
     const toggleDetails = () => {
       showDetails.value = !showDetails.value;
     };
+
     return { showDetails, toggleDetails, kycStatus, userKyc };
   },
 };

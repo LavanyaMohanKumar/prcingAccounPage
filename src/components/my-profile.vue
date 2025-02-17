@@ -62,16 +62,14 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
-import { useStore } from "vuex";
+import { ref, computed, inject } from "vue";
 
 export default {
   setup() {
-    const store = useStore();
     const profileImage = ref(require("@/assets/images/avatar.png"));
-    const userProfile = computed(() => store.getters.userProfile || {});
-    const userName = computed(() => userProfile.value.userName || "");
-    const userEmail = computed(() => userProfile.value.userEmail || "");
+    const userProfile = inject("userProfile");
+    const userName = computed(() => userProfile.value?.userName || "");
+    const userEmail = computed(() => userProfile.value?.userEmail || "");
     const showNameDialog = ref(false);
     const tempName = ref("");
     const onImageChange = (event) => {

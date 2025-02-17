@@ -154,14 +154,13 @@
 </template>
 
 <script>
-import { computed } from "vue";
-import { useStore } from "vuex";
+import { computed, inject } from "vue";
 
 export default {
   name: "SubscriptionCard",
   setup() {
-    const store = useStore();
-    const subscriptionData = computed(() => store.state.userSubscription || {});
+    const userSubscription = inject("userSubscription");
+    const subscriptionData = computed(() => userSubscription.value || {});
     const openLink = () => {
       if (subscriptionData.value.buttonUrl) {
         window.open(subscriptionData.value.buttonUrl, "_blank");

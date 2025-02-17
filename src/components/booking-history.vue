@@ -1,6 +1,6 @@
 <template>
   <div class="card p-3">
-    <h2 class="table-title">Billing History</h2>
+    <strong class="mb-3">Billing History</strong>
     <div class="table-wrapper">
       <b-table
         :items="products"
@@ -26,63 +26,48 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
-import { useStore } from "vuex";
+import { ref, computed, inject, watch } from "vue";
 
 export default {
   setup() {
-    const store = useStore();
     const BASE_URL = process.env.VUE_APP_BASE_URL;
-
     const fields = [
       { key: "id", label: "Order ID" },
       { key: "Date", label: "Date" },
       { key: "Description", label: "Description" },
       { key: "Amount", label: "Amount" },
     ];
-
-    const allProducts = ref([]);
+    const billingHistory = inject("billingHistory");
+    const allProducts = computed(() => {
+      if (!billingHistory.value) return [];
+      return Object.values(billingHistory.value).map((item) => {
+        const match = item.id.match(/\/view-order\/(\d+)\/?/);
+        const orderNumber = match ? match[1] : "Unknown";
+        const orderUrl = `${BASE_URL}/my-account/view-order/${orderNumber}`;
+        return {
+          id: { number: orderNumber, url: orderUrl },
+          Date: item.orderDate,
+          Description: item.orderitem,
+          Amount: item.orderTotal.replace(/<\/?[^>]+(>|$)/g, ""),
+        };
+      });
+    });
     const products = ref([]);
     const showAll = ref(false);
-
-    const fetchBillingHistory = async () => {
-      try {
-        if (!store.state.billingHistory) {
-          await store.dispatch("fetchUserData");
-        }
-
-        console.log("Fetched billing history:", store.getters.billingHistory);
-        const rawBillingHistory = store.getters.billingHistory || {};
-        allProducts.value = Object.values(rawBillingHistory).map((item) => {
-          const match = item.id.match(/\/view-order\/(\d+)\/?/);
-          const orderNumber = match ? match[1] : "Unknown";
-          const orderUrl = `${BASE_URL}/my-account/view-order/${orderNumber}`;
-          return {
-            id: { number: orderNumber, url: orderUrl },
-            Date: item.orderDate,
-            Description: item.orderitem,
-            Amount: item.orderTotal.replace(/<\/?[^>]+(>|$)/g, ""),
-          };
-        });
-
-        products.value = allProducts.value.slice(0, 2);
-      } catch (error) {
-        console.error("Failed to load billing history:", error);
-      }
+    const updateProducts = () => {
+      products.value = allProducts.value.slice(0, 2);
     };
-
-    onMounted(fetchBillingHistory);
-
+    watch(allProducts, (newProducts) => {
+      products.value = newProducts.slice(0, 3);
+    });
     const viewMore = () => {
       products.value = allProducts.value;
       showAll.value = true;
     };
-
     const viewLess = () => {
-      products.value = allProducts.value.slice(0, 2);
+      updateProducts();
       showAll.value = false;
     };
-
     return { products, fields, showAll, viewMore, viewLess };
   },
 };
@@ -93,13 +78,6 @@ export default {
   background: #ffffff;
   border-radius: 8px;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.table-title {
-  font-weight: bold;
-  font-size: 24px;
-  color: #333;
-  padding: 8px 0;
 }
 
 .table-wrapper {
