@@ -104,19 +104,35 @@
             What is the primary reason for canceling your subscription?
           </p>
           <label>
-            <input type="radio" v-model="selectedReason" value="not_useful" />
+            <input
+              type="radio"
+              v-model="selectedReason"
+              value="I don't find it useful"
+            />
             I don't find it useful
           </label>
           <label>
-            <input type="radio" v-model="selectedReason" value="no_time" />
+            <input
+              type="radio"
+              v-model="selectedReason"
+              value="I don't find time to use it"
+            />
             I don't find time to use it
           </label>
           <label>
-            <input type="radio" v-model="selectedReason" value="expensive" />
+            <input
+              type="radio"
+              v-model="selectedReason"
+              value="I find it expensive"
+            />
             I find it expensive
           </label>
           <label>
-            <input type="radio" v-model="selectedReason" value="dont_invest" />
+            <input
+              type="radio"
+              v-model="selectedReason"
+              value="I don't invest"
+            />
             I don't invest
           </label>
           <label>
@@ -160,6 +176,7 @@ export default {
       showInitialPopup: false,
       showReasonPopup: false,
       selectedReason: null,
+      otherReasonText: null,
     };
   },
   methods: {
@@ -204,35 +221,24 @@ export default {
         alert("Please select a reason for cancellation.");
         return;
       }
-
       const cancelReason =
         this.selectedReason === "others"
           ? this.otherReasonText
           : this.selectedReason;
-
-      try {
-        const response = await fetch(
-          "https://staging.primeinvestor.in/wp-admin/admin-ajax.php?action=cancelSubscription",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ cancel_reason: cancelReason }),
-          }
-        );
-
-        const data = await response.json();
-
-        if (data.success) {
-          alert(data.data);
-          this.closeReasonPopup();
-        } else {
-          alert("Error: " + data.data);
-        }
-      } catch (error) {
-        console.error("Error cancelling subscription:", error);
-        alert("Something went wrong. Please try again.");
+      const apiUrl = `${
+        process.env.VUE_APP_BASE_URL
+      }wp-admin/admin-ajax.php?action=cancelSubscription&cancel_reason=${encodeURIComponent(
+        cancelReason
+      )}`;
+      const response = await fetch(apiUrl, {
+        method: "POST",
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert(data.data);
+        this.closeReasonPopup();
+      } else {
+        alert("Error: " + data.data);
       }
     },
   },
