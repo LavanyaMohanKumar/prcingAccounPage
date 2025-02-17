@@ -85,10 +85,7 @@ export default {
     const closeNameDialog = () => {
       showNameDialog.value = false;
     };
-    const saveName = () => {
-      store.commit("SET_USER_NAME", tempName.value);
-      showNameDialog.value = false;
-    };
+
     return {
       userProfile,
       userName,
@@ -99,7 +96,6 @@ export default {
       tempName,
       openNameDialog,
       closeNameDialog,
-      saveName,
     };
   },
 };

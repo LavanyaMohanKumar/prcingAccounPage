@@ -225,10 +225,10 @@ export default {
         const data = await response.json();
 
         if (data.success) {
-          alert(data.data); // Show success message
-          this.closeReasonPopup(); // Close the popup
+          alert(data.data);
+          this.closeReasonPopup();
         } else {
-          alert("Error: " + data.data); // Show error message
+          alert("Error: " + data.data);
         }
       } catch (error) {
         console.error("Error cancelling subscription:", error);
