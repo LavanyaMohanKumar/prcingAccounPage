@@ -158,14 +158,18 @@
         {{ nextPaymentDate }}
       </p>
       <b-button
-        @click="openLink"
+        @click="resumeSubscription"
         class="plan-button"
         v-if="subscriptionMessage"
       >
         Activate auto-debit
       </b-button>
       <b-button
-        @click="openLink"
+        @click="
+          subscriptionData.buttonText === 'Activate auto-debit'
+            ? resumeSubscription()
+            : openLink()
+        "
         class="plan-button"
         v-if="subscriptionData.buttonText"
       >
@@ -196,14 +200,18 @@
         {{ subscriptionData.nextPay }}
       </p>
       <b-button
-        @click="openLink"
+        @click="resumeSubscription"
         class="plan-button"
         v-if="subscriptionMessage"
       >
         Activate auto-debit
       </b-button>
       <b-button
-        @click="resumeSubscription"
+        @click="
+          subscriptionData.buttonText === 'Activate auto-debit'
+            ? resumeSubscription()
+            : openLink()
+        "
         class="plan-button"
         v-if="subscriptionData.buttonText"
       >
