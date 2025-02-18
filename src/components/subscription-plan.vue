@@ -297,6 +297,7 @@ export default {
 
         if (data.success) {
           promoMessage.value = data.data.message;
+          openRazorpayPopup(data.data);
         } else {
           console.error("Subscription renewal failed", data.data.message);
           promoMessage.value = data.data.message;
@@ -306,37 +307,6 @@ export default {
         promoMessage.value = "An unexpected error occurred.";
       }
     };
-
-    const applyCoupon = async () => {
-      if (!couponCode.value) {
-        errorMessage.value = "Please enter a coupon code.";
-        return;
-      }
-
-      try {
-        const apiUrl = `${process.env.VUE_APP_BASE_URL}wp-admin/admin-ajax.php?action=check_subscription_coupon&coupon_code=${couponCode.value}`;
-
-        const response = await fetch(apiUrl, {
-          method: "POST",
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          savedCouponCode.value = couponCode.value;
-          promoMessage.value = data.data.promoInfo;
-          buttonText.value = data.data.buttonText;
-          couponApplied.value = true;
-          showCouponInput.value = false;
-        } else {
-          errorMessage.value = data.data.message;
-        }
-      } catch (error) {
-        console.error("Error applying coupon:", error);
-        errorMessage.value = "An unexpected error occurred.";
-      }
-    };
-    const subscriptionData = computed(() => userSubscription.value || {});
     const loadRazorpayScript = () => {
       return new Promise((resolve, reject) => {
         if (typeof Razorpay !== "undefined") {
@@ -385,6 +355,36 @@ export default {
         console.error("Error loading Razorpay script:", error);
       }
     };
+    const applyCoupon = async () => {
+      if (!couponCode.value) {
+        errorMessage.value = "Please enter a coupon code.";
+        return;
+      }
+
+      try {
+        const apiUrl = `${process.env.VUE_APP_BASE_URL}wp-admin/admin-ajax.php?action=check_subscription_coupon&coupon_code=${couponCode.value}`;
+
+        const response = await fetch(apiUrl, {
+          method: "POST",
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          savedCouponCode.value = couponCode.value;
+          promoMessage.value = data.data.promoInfo;
+          buttonText.value = data.data.buttonText;
+          couponApplied.value = true;
+          showCouponInput.value = false;
+        } else {
+          errorMessage.value = data.data.message;
+        }
+      } catch (error) {
+        console.error("Error applying coupon:", error);
+        errorMessage.value = "An unexpected error occurred.";
+      }
+    };
+    const subscriptionData = computed(() => userSubscription.value || {});
 
     const openLink = () => {
       if (subscriptionData.value.buttonUrl) {
