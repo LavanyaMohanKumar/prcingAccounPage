@@ -177,41 +177,27 @@
             : openLink()
         "
         class="plan-button"
-        v-if="subscriptionData.buttonText && !subscriptionData.cancelSub"
+        v-if="subscriptionData.buttonText"
       >
         {{ subscriptionData.buttonText }}
       </b-button>
     </div>
     <div class="subscription-footer" v-if="subscriptionData.userType === 6">
-      <p v-if="subscriptionMessage" class="red-text">
-        {{ subscriptionMessage }}
+      <p class="red-text" v-if="subscriptionData.planInfo">
+        {{ subscriptionData.planInfo }}
       </p>
-      <p v-if="subscriptionData.cancelSub" class="red-text">
-        {{ subscriptionData.cancelSub }}
-      </p>
-      <p v-if="subscriptionData.planInfo">
+      <p v-if="subscriptionData.textlabelone">
         <img
           src="@/assets/images/creditcard.svg"
           alt="creditcard"
           class="icon"
         />
-        {{ subscriptionData.planInfo }}
+        {{ subscriptionData.textlabelone }}
       </p>
-      <p v-if="nextPaymentDate">
-        <img src="@/assets/images/calendar.svg" alt="calendar" class="icon" />
-        {{ nextPaymentDate }}
+      <p v-if="promoMessage">
+        <img src="@/assets/images/percent.svg" alt="percent" class="icon" />
+        {{ promoMessage }}
       </p>
-      <p v-if="subscriptionData.nextPay">
-        <img src="@/assets/images/calendar.svg" alt="calender" class="icon" />
-        {{ subscriptionData.nextPay }}
-      </p>
-      <b-button
-        @click="resumeSubscription"
-        class="plan-button"
-        v-if="subscriptionMessage"
-      >
-        Activate auto-debit
-      </b-button>
       <b-button
         @click="
           subscriptionData.buttonText === 'Activate auto-debit'
@@ -219,10 +205,30 @@
             : openLink()
         "
         class="plan-button"
-        v-if="subscriptionData.buttonText && !subscriptionData.cancelSub"
+        v-if="subscriptionData.buttonText"
       >
         {{ subscriptionData.buttonText }}
       </b-button>
+      <div class="text-center">
+        <div v-if="showCouponInput" class="mt-2 d-flex gap-2">
+          <input
+            type="text"
+            v-model="couponCode"
+            placeholder="Enter coupon code"
+            class="form-control"
+            style="width: 70%"
+          />
+          <button @click="applyCoupon" class="btn button-color">Apply</button>
+        </div>
+        <small @click="showCouponInput = true" class="mt-3">
+          Have a coupon code?
+          <span
+            class="text-decoration-underline cursor-pointer"
+            style="color: #00a3d9"
+            >Apply coupon</span
+          >
+        </small>
+      </div>
     </div>
   </div>
 </template>
@@ -236,6 +242,43 @@ export default {
   setup() {
     const userSubscription = inject("userSubscription");
     const nextPaymentDate = ref(null);
+    const couponCode = ref("");
+    const showCouponInput = ref(false);
+    const promoMessage = ref("");
+    const buttonText = ref("");
+    const errorMessage = ref("");
+    const toggleCoupon = () => {
+      showCouponInput.value = !showCouponInput.value;
+    };
+    const applyCoupon = async () => {
+      if (!couponCode.value) {
+        errorMessage.value = "Please enter a coupon code.";
+        return;
+      }
+
+      try {
+        const apiUrl = `${process.env.VUE_APP_BASE_URL}wp-admin/admin-ajax.php?action=check_subscription_coupon&coupon_code=${couponCode.value}`;
+
+        const response = await fetch(apiUrl, {
+          method: "POST",
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          promoMessage.value = data.data.promoInfo;
+          buttonText.value = data.data.buttonText;
+          errorMessage.value = "";
+        } else {
+          errorMessage.value = data.data.message;
+          promoMessage.value = "";
+          buttonText.value = "";
+        }
+      } catch (error) {
+        console.error("Error applying coupon:", error);
+        errorMessage.value = "An unexpected error occurred.";
+      }
+    };
     const subscriptionData = computed(() => userSubscription.value || {});
     const openLink = () => {
       if (subscriptionData.value.buttonUrl) {
@@ -271,6 +314,13 @@ export default {
       openLink,
       subscriptionMessage,
       resumeSubscription,
+      showCouponInput,
+      couponCode,
+      toggleCoupon,
+      promoMessage,
+      buttonText,
+      errorMessage,
+      applyCoupon,
     };
   },
 };
@@ -368,5 +418,11 @@ export default {
   background-color: #f2f2f2;
   padding: 12px 16px;
   color: #333;
+}
+
+.button-color {
+  width: 30%;
+  background: #00a3d9;
+  color: white;
 }
 </style>
