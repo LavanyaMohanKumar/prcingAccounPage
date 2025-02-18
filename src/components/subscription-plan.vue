@@ -149,7 +149,13 @@
         />
         {{ subscriptionData.planInfo }}
       </p>
-      <p v-if="subscriptionData.nextPay">
+      <p
+        v-if="
+          !subscriptionMessage &&
+          !subscriptionData.cancelSub &&
+          subscriptionData.nextPay
+        "
+      >
         <img src="@/assets/images/calendar.svg" alt="calender" class="icon" />
         {{ subscriptionData.nextPay }}
       </p>
@@ -171,7 +177,7 @@
             : openLink()
         "
         class="plan-button"
-        v-if="subscriptionData.buttonText"
+        vv-if="subscriptionData.buttonText && !subscriptionData.cancelSub"
       >
         {{ subscriptionData.buttonText }}
       </b-button>
@@ -213,7 +219,7 @@
             : openLink()
         "
         class="plan-button"
-        v-if="subscriptionData.buttonText"
+        v-if="subscriptionData.buttonText && !subscriptionData.cancelSub"
       >
         {{ subscriptionData.buttonText }}
       </b-button>
@@ -250,6 +256,7 @@ export default {
         const data = await response.json();
         if (data.success) {
           store.commit("setNextPaymentDate", data.data);
+          store.commit("setSubscriptionMessage", null);
         } else {
           alert("Error: " + data.data);
         }
