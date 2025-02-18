@@ -337,6 +337,55 @@ export default {
       }
     };
     const subscriptionData = computed(() => userSubscription.value || {});
+    const loadRazorpayScript = () => {
+      return new Promise((resolve, reject) => {
+        if (typeof Razorpay !== "undefined") {
+          resolve();
+        } else {
+          const script = document.createElement("script");
+          script.src = "https://checkout.razorpay.com/v1/checkout.js";
+          script.onload = () => resolve();
+          script.onerror = () => reject("Razorpay script failed to load");
+          document.body.appendChild(script);
+        }
+      });
+    };
+    const openRazorpayPopup = async (orderData) => {
+      try {
+        await loadRazorpayScript();
+        const userProfile = inject("userProfile");
+        const userKyc = inject("userKyc");
+        const userName = userProfile?.userName;
+        const userEmail = userProfile?.userEmail;
+        const userContact = userKyc?.phone;
+        const options = {
+          key: orderData.razorpay_order_key,
+          amount: orderData.amount,
+          currency: "INR",
+          order_id: orderData.razorpay_order_id,
+          customer_id: orderData.razorpay_customer_id,
+          prefill: {
+            name: userName,
+            email: userEmail,
+            contact: userContact,
+          },
+          handler: function (response) {
+            alert(
+              "Payment successful! Your order ID is " +
+                response.razorpay_order_id
+            );
+          },
+          theme: {
+            color: "#00a3d9",
+          },
+        };
+        const razorpay = new window.Razorpay(options);
+        razorpay.open();
+      } catch (error) {
+        console.error("Error loading Razorpay script:", error);
+      }
+    };
+
     const openLink = () => {
       if (subscriptionData.value.buttonUrl) {
         window.open(subscriptionData.value.buttonUrl, "_blank");
@@ -382,6 +431,7 @@ export default {
       removeCoupon,
       savedCouponCode,
       handleSubscriptionRenewal,
+      openRazorpayPopup,
     };
   },
 };
