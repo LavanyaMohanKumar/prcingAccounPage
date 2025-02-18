@@ -245,7 +245,6 @@ export default {
         this.closeReasonPopup();
         setTimeout(() => {
           this.store.commit("SET_SUBSCRIPTION_MESSAGE", data.data);
-          alert(data.data);
         }, 500);
       } else {
         alert("Error: " + data.data);

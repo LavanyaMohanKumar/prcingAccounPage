@@ -20,7 +20,6 @@
       </div>
     </div>
     <div class="subscription-footer" v-if="subscriptionData.userType === 0">
-      <p v-if="subscriptionMessage">{{ subscriptionMessage }}</p>
       <p
         v-if="subscriptionData.planInfo"
         class="fw-bold"
@@ -55,7 +54,6 @@
       class="subscription-footer"
       v-else-if="subscriptionData.userType === 1"
     >
-      <p v-if="subscriptionMessage">{{ subscriptionMessage }}</p>
       <p
         v-if="subscriptionData.planInfo"
         class="fw-bold"
@@ -87,7 +85,6 @@
       </div>
     </div>
     <div class="subscription-footer" v-if="subscriptionData.userType === 2">
-      <p v-if="subscriptionMessage">{{ subscriptionMessage }}</p>
       <p v-if="subscriptionData.planInfo" class="fw-bold">
         {{ subscriptionData.planInfo }}
       </p>
@@ -97,7 +94,6 @@
       <p v-if="subscriptionData.textlabeltwo">
         {{ subscriptionData.textlabeltwo }}
       </p>
-
       <b-button
         @click="openLink"
         class="plan-button"
@@ -107,7 +103,6 @@
       </b-button>
     </div>
     <div class="subscription-footer" v-if="subscriptionData.userType === 3">
-      <p v-if="subscriptionMessage">{{ subscriptionMessage }}</p>
       <p v-if="subscriptionData.planInfo" class="fw-bold">
         {{ subscriptionData.planInfo }}
       </p>
@@ -117,7 +112,6 @@
       <p v-if="subscriptionData.textlabeltwo">
         {{ subscriptionData.textlabeltwo }}
       </p>
-
       <b-button
         @click="openLink"
         class="plan-button"
@@ -127,7 +121,6 @@
       </b-button>
     </div>
     <div class="subscription-footer" v-if="subscriptionData.userType === 4">
-      <p v-if="subscriptionMessage">{{ subscriptionMessage }}</p>
       <p v-if="subscriptionData.planInfo">
         <img
           src="@/assets/images/creditcard.svg"
@@ -142,7 +135,12 @@
       </p>
     </div>
     <div class="subscription-footer" v-if="subscriptionData.userType === 5">
-      <p v-if="subscriptionMessage">{{ subscriptionMessage }}</p>
+      <p v-if="subscriptionMessage" class="red-text">
+        {{ subscriptionMessage }}
+      </p>
+      <p v-if="subscriptionData.cancelSub" class="red-text">
+        {{ subscriptionData.cancelSub }}
+      </p>
       <p v-if="subscriptionData.planInfo">
         <img
           src="@/assets/images/creditcard.svg"
@@ -155,9 +153,32 @@
         <img src="@/assets/images/calendar.svg" alt="calender" class="icon" />
         {{ subscriptionData.nextPay }}
       </p>
+      <p v-if="nextPaymentDate">
+        <img src="@/assets/images/calendar.svg" alt="calendar" class="icon" />
+        {{ nextPaymentDate }}
+      </p>
+      <b-button
+        @click="openLink"
+        class="plan-button"
+        v-if="subscriptionMessage"
+      >
+        Activate auto-debit
+      </b-button>
+      <b-button
+        @click="openLink"
+        class="plan-button"
+        v-if="subscriptionData.buttonText"
+      >
+        {{ subscriptionData.buttonText }}
+      </b-button>
     </div>
     <div class="subscription-footer" v-if="subscriptionData.userType === 6">
-      <p v-if="subscriptionMessage">{{ subscriptionMessage }}</p>
+      <p v-if="subscriptionMessage" class="red-text">
+        {{ subscriptionMessage }}
+      </p>
+      <p v-if="subscriptionData.cancelSub" class="red-text">
+        {{ subscriptionData.cancelSub }}
+      </p>
       <p v-if="subscriptionData.planInfo">
         <img
           src="@/assets/images/creditcard.svg"
@@ -165,6 +186,10 @@
           class="icon"
         />
         {{ subscriptionData.planInfo }}
+      </p>
+      <p v-if="nextPaymentDate">
+        <img src="@/assets/images/calendar.svg" alt="calendar" class="icon" />
+        {{ nextPaymentDate }}
       </p>
       <p v-if="subscriptionData.nextPay">
         <img src="@/assets/images/calendar.svg" alt="calender" class="icon" />
@@ -172,6 +197,13 @@
       </p>
       <b-button
         @click="openLink"
+        class="plan-button"
+        v-if="subscriptionMessage"
+      >
+        Activate auto-debit
+      </b-button>
+      <b-button
+        @click="resumeSubscription"
         class="plan-button"
         v-if="subscriptionData.buttonText"
       >
@@ -201,10 +233,27 @@ export default {
     const subscriptionMessage = computed(
       () => store.getters.subscriptionMessage
     );
+    const resumeSubscription = async () => {
+      try {
+        const apiUrl = `${process.env.VUE_APP_BASE_URL}wp-admin/admin-ajax.php?action=resumeSubscription`;
+        const response = await fetch(apiUrl, {
+          method: "POST",
+        });
+        const data = await response.json();
+        if (data.success) {
+          store.commit("setNextPaymentDate", data.data);
+        } else {
+          alert("Error: " + data.data);
+        }
+      } catch (error) {
+        alert("An unexpected error occurred.");
+      }
+    };
     return {
       subscriptionData,
       openLink,
       subscriptionMessage,
+      resumeSubscription,
     };
   },
 };

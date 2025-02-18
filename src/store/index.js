@@ -9,6 +9,7 @@ export default createStore({
     billingHistory: null,
     autoPay: null,
     subscriptionMessage: null,
+    nextPaymentDate: "", 
   },
   mutations: {
     SET_USER_DATA(state, data) {
@@ -24,6 +25,9 @@ export default createStore({
     },
     SET_SUBSCRIPTION_MESSAGE(state, message) {
       state.subscriptionMessage = message;
+    },
+    setNextPaymentDate(state, date) {
+      state.nextPaymentDate = date;
     },
   },
   actions: {
@@ -54,6 +58,7 @@ export default createStore({
     billingHistory: (state) => state.billingHistory,
     autoPay: (state) => state.autoPay,
     subscriptionMessage: (state) => state.subscriptionMessage,
+    nextPaymentDate: (state) => state.nextPaymentDate,
   },
 });
 
