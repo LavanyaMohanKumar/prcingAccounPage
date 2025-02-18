@@ -198,19 +198,25 @@
         <img src="@/assets/images/percent.svg" alt="percent" class="icon" />
         {{ promoMessage }}
       </p>
-      <b-button
-        @click="
-          subscriptionData.buttonText === 'Activate auto-debit'
-            ? resumeSubscription()
-            : openLink()
-        "
-        class="plan-button"
-        v-if="subscriptionData.buttonText"
-      >
-        {{ subscriptionData.buttonText }}
-      </b-button>
+      <div>
+        <b-button
+          class="plan-button"
+          v-if="buttonText"
+          @click="handleSubscriptionRenewal"
+        >
+          {{ buttonText }}
+        </b-button>
+
+        <b-button
+          class="plan-button"
+          v-if="subscriptionData.buttonText && !buttonText"
+          @click="handleSubscriptionRenewal"
+        >
+          {{ subscriptionData.buttonText }}
+        </b-button>
+      </div>
       <div class="text-center">
-        <div v-if="showCouponInput" class="mt-2 d-flex gap-2">
+        <div v-if="showCouponInput && !couponApplied" class="mt-2 d-flex gap-2">
           <input
             type="text"
             v-model="couponCode"
@@ -220,12 +226,25 @@
           />
           <button @click="applyCoupon" class="btn button-color">Apply</button>
         </div>
-        <small @click="showCouponInput = true" class="mt-3">
+        <p v-if="errorMessage" class="mt-2 text-danger">{{ errorMessage }}</p>
+        <small
+          v-if="!couponApplied"
+          @click="showCouponInput = true"
+          class="mt-4"
+        >
           Have a coupon code?
           <span
             class="text-decoration-underline cursor-pointer"
             style="color: #00a3d9"
             >Apply coupon</span
+          >
+        </small>
+
+        <small v-else @click="removeCoupon" class="mt-3">
+          <span
+            class="text-decoration-underline cursor-pointer"
+            style="color: #00a3d9"
+            >Remove coupon</span
           >
         </small>
       </div>
@@ -247,9 +266,47 @@ export default {
     const promoMessage = ref("");
     const buttonText = ref("");
     const errorMessage = ref("");
+    const couponApplied = ref(false);
+    const savedCouponCode = ref(null);
+
     const toggleCoupon = () => {
       showCouponInput.value = !showCouponInput.value;
     };
+    const removeCoupon = () => {
+      couponApplied.value = false;
+      couponCode.value = "";
+      promoMessage.value = "";
+      buttonText.value = "";
+    };
+
+    const handleSubscriptionRenewal = async () => {
+      try {
+        let apiUrl = `${process.env.VUE_APP_BASE_URL}wp-admin/admin-ajax.php?action=resumePaySubscription`;
+        if (savedCouponCode.value) {
+          apiUrl += `&coupon_code=${savedCouponCode.value}`;
+        }
+
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          promoMessage.value = data.data.message;
+        } else {
+          console.error("Subscription renewal failed", data.data.message);
+          promoMessage.value = data.data.message;
+        }
+      } catch (error) {
+        console.error("Error renewing subscription:", error);
+        promoMessage.value = "An unexpected error occurred.";
+      }
+    };
+
     const applyCoupon = async () => {
       if (!couponCode.value) {
         errorMessage.value = "Please enter a coupon code.";
@@ -266,13 +323,13 @@ export default {
         const data = await response.json();
 
         if (data.success) {
+          savedCouponCode.value = couponCode.value;
           promoMessage.value = data.data.promoInfo;
           buttonText.value = data.data.buttonText;
-          errorMessage.value = "";
+          couponApplied.value = true;
+          showCouponInput.value = false;
         } else {
           errorMessage.value = data.data.message;
-          promoMessage.value = "";
-          buttonText.value = "";
         }
       } catch (error) {
         console.error("Error applying coupon:", error);
@@ -321,6 +378,10 @@ export default {
       buttonText,
       errorMessage,
       applyCoupon,
+      couponApplied,
+      removeCoupon,
+      savedCouponCode,
+      handleSubscriptionRenewal,
     };
   },
 };
