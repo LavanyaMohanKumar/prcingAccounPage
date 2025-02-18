@@ -177,7 +177,7 @@
             : openLink()
         "
         class="plan-button"
-        vv-if="subscriptionData.buttonText && !subscriptionData.cancelSub"
+        v-if="subscriptionData.buttonText && !subscriptionData.cancelSub"
       >
         {{ subscriptionData.buttonText }}
       </b-button>
@@ -228,13 +228,14 @@
 </template>
 
 <script>
-import { computed, inject } from "vue";
+import { computed, inject, ref } from "vue";
 import { useStore } from "vuex";
 
 export default {
   name: "SubscriptionCard",
   setup() {
     const userSubscription = inject("userSubscription");
+    const nextPaymentDate = ref(null);
     const subscriptionData = computed(() => userSubscription.value || {});
     const openLink = () => {
       if (subscriptionData.value.buttonUrl) {
@@ -255,6 +256,7 @@ export default {
         });
         const data = await response.json();
         if (data.success) {
+          nextPaymentDate.value = data.data;
           store.commit("setNextPaymentDate", data.data);
           store.commit("setSubscriptionMessage", null);
         } else {
