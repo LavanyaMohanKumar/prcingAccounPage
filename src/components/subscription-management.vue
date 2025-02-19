@@ -27,11 +27,14 @@
       </ul>
     </div>
 
-    <div v-if="showBillingPopup" class="popup-overlay" @click.self="closePopup">
+    <div
+      v-if="showBillingPopup"
+      class="popup-overlay"
+      @closePopup="showBillingPopup = false"
+    >
       <div class="popup-container">
         <div class="popup-header">
           <h3>Choose billing period</h3>
-          <button class="close-button" @click="closePopup">✖</button>
         </div>
 
         <div class="billing-options">
@@ -51,21 +54,22 @@
 
           <div
             class="billing-option"
-            :class="{ active: selectedOption === 'monthly' }"
-            @click="selectOption('monthly')"
+            :class="{ active: selectedOption === 'annually' }"
+            @click="selectOption('annually')"
           >
             <label class="option-label">
               <div class="option-content">
-                <span>Monthly billing</span>
+                <span>annually billing</span>
                 <span class="price">₹ 999 per month</span>
               </div>
-              <input type="radio" v-model="selectedOption" value="monthly" />
+              <input type="radio" v-model="selectedOption" value="annually" />
             </label>
           </div>
         </div>
 
         <div class="button-group">
           <button class="back-button" @click="closePopup">Back</button>
+
           <button
             class="proceed-button"
             :disabled="!isOptionChanged"
@@ -174,8 +178,8 @@ export default {
   setup(props, { emit }) {
     const userSubscription = inject("userSubscription");
     const billingVariations = {
-      quarterly: process.env.SUBSCRIPTION_QUARTERLY,
-      annual: process.env.SUBSCRIPTION_ANNUAL",
+      quarterly: process.env.VUE_APP_SUBSCRIPTION_QUARTERLY,
+      annually: process.env.VUE_APP_SUBSCRIPTION_ANNUALLY,
     };
     const selectedOption = ref(null);
     const currentBillingOption = ref(null);
@@ -185,9 +189,9 @@ export default {
       if (currentBillingId === billingVariations.quarterly) {
         selectedOption.value = "quarterly";
         currentBillingOption.value = "quarterly";
-      } else if (currentBillingId === billingVariations.monthly) {
-        selectedOption.value = "monthly";
-        currentBillingOption.value = "monthly";
+      } else if (currentBillingId === billingVariations.annually) {
+        selectedOption.value = "annually";
+        currentBillingOption.value = "annually";
       }
     };
 
@@ -211,7 +215,6 @@ export default {
     const selectOption = (option) => {
       selectedOption.value = option;
     };
-
     const switchBillingCycle = async () => {
       if (!isOptionChanged.value) return;
 
@@ -237,16 +240,12 @@ export default {
       }
     };
 
-    const closePopup = () => {
-      emit("closePopup");
-    };
-
     return {
+      emit,
       userSubscription,
       switchBillingCycle,
       selectOption,
       selectedOption,
-      closePopup,
       isOptionChanged,
     };
   },
@@ -267,6 +266,10 @@ export default {
   methods: {
     toggleSubscription() {
       this.isOpen = !this.isOpen;
+    },
+    closePopup() {
+      this.showBillingPopup = false;
+      this.$emit("closePopup");
     },
     openBillingPopup() {
       this.showBillingPopup = true;

@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { ref, computed, inject, watch } from "vue";
+import { ref, computed, inject, watch, onMounted } from "vue";
 
 export default {
   setup() {
@@ -57,6 +57,9 @@ export default {
     const updateProducts = () => {
       products.value = allProducts.value.slice(0, 2);
     };
+    onMounted(() => {
+      updateProducts();
+    });
     watch(allProducts, (newProducts) => {
       products.value = newProducts.slice(0, 3);
     });

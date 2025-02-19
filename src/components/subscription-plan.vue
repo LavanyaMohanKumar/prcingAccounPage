@@ -390,6 +390,7 @@ export default {
           store.commit("setNextPaymentDate", data.data);
           store.commit("setSubscriptionMessage", null);
           subscriptionData.value.buttonText = null;
+          store.dispatch("fetchUserData");
         } else {
           alert("Error: " + data.data);
         }
