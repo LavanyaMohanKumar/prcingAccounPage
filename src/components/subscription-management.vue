@@ -167,6 +167,10 @@
 <script>
 import { useStore } from "vuex";
 export default {
+  setup() {
+    const store = useStore();
+    return { store };
+  },
   data() {
     return {
       isOpen: false,
@@ -180,10 +184,6 @@ export default {
       otherReasonText: null,
       successMessage: null,
     };
-  },
-  setup() {
-    const store = useStore();
-    return { store };
   },
   methods: {
     toggleSubscription() {

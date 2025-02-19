@@ -322,33 +322,22 @@ export default {
     const openRazorpayPopup = async (orderData) => {
       try {
         await loadRazorpayScript();
-        const userProfile = inject("userProfile");
-        const userKyc = inject("userKyc");
-        const userName = userProfile?.userName;
-        const userEmail = userProfile?.userEmail;
-        const userContact = userKyc?.phone;
         const options = {
           key: orderData.razorpay_order_key,
-          amount: orderData.amount,
-          currency: "INR",
           order_id: orderData.razorpay_order_id,
           customer_id: orderData.razorpay_customer_id,
-          prefill: {
-            name: userName,
-            email: userEmail,
-            contact: userContact,
-          },
+          recurring: "1",
           handler: function (response) {
             alert(
               "Payment successful! Your order ID is " +
                 response.razorpay_order_id
             );
           },
-          theme: {
-            color: "#00a3d9",
+          notes: {
+            "note_key 1": "Resubcription order",
           },
         };
-        const razorpay = new window.Razorpay(options);
+        var razorpay = new Razorpay(options);
         razorpay.open();
       } catch (error) {
         console.error("Error loading Razorpay script:", error);
@@ -359,7 +348,6 @@ export default {
         errorMessage.value = "Please enter a coupon code.";
         return;
       }
-
       try {
         const apiUrl = `${process.env.VUE_APP_BASE_URL}wp-admin/admin-ajax.php?action=check_subscription_coupon&coupon_code=${couponCode.value}`;
 
