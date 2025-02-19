@@ -174,8 +174,8 @@ export default {
   setup(props, { emit }) {
     const userSubscription = inject("userSubscription");
     const billingVariations = {
-      quarterly: process.env.SUBSCRIPTION_QUARTERLY || "198169",
-      annual: process.env.SUBSCRIPTION_ANNUAL || "198211",
+      quarterly: process.env.SUBSCRIPTION_QUARTERLY,
+      annual: process.env.SUBSCRIPTION_ANNUAL",
     };
     const selectedOption = ref(null);
     const currentBillingOption = ref(null);
