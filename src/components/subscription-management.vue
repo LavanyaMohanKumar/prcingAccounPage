@@ -219,7 +219,7 @@ export default {
       if (!isOptionChanged.value) return;
 
       const newVariationId = billingVariations[selectedOption.value];
-      const apiUrl = `${process.env.VUE_APP_BASE_URL}wp-admin/admin-ajax.php?action=prime_switch_billing_cycle&new_variation_id=${newVariationId}`;
+      const apiUrl = `${process.env.VUE_APP_BASE_URL}/wp-admin/admin-ajax.php?action=prime_switch_billing_cycle&new_variation_id=${newVariationId}`;
 
       try {
         const response = await fetch(apiUrl, {
@@ -309,7 +309,7 @@ export default {
           : this.selectedReason;
       const apiUrl = `${
         process.env.VUE_APP_BASE_URL
-      }wp-admin/admin-ajax.php?action=cancelSubscription&cancel_reason=${encodeURIComponent(
+      }/wp-admin/admin-ajax.php?action=cancelSubscription&cancel_reason=${encodeURIComponent(
         cancelReason
       )}`;
       const response = await fetch(apiUrl, {

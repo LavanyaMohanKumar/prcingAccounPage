@@ -280,7 +280,7 @@ export default {
 
     const handleSubscriptionRenewal = async () => {
       try {
-        let apiUrl = `${process.env.VUE_APP_BASE_URL}wp-admin/admin-ajax.php?action=resumePaySubscription`;
+        let apiUrl = `${process.env.VUE_APP_BASE_URL}/wp-admin/admin-ajax.php?action=resumePaySubscription`;
         if (savedCouponCode.value) {
           apiUrl += `&coupon_code=${savedCouponCode.value}`;
         }
@@ -344,7 +344,7 @@ export default {
         return;
       }
       try {
-        const apiUrl = `${process.env.VUE_APP_BASE_URL}wp-admin/admin-ajax.php?action=check_subscription_coupon&coupon_code=${couponCode.value}`;
+        const apiUrl = `${process.env.VUE_APP_BASE_URL}/wp-admin/admin-ajax.php?action=check_subscription_coupon&coupon_code=${couponCode.value}`;
 
         const response = await fetch(apiUrl, {
           method: "POST",
@@ -381,7 +381,7 @@ export default {
     );
     const resumeSubscription = async () => {
       try {
-        const apiUrl = `${process.env.VUE_APP_BASE_URL}wp-admin/admin-ajax.php?action=resumeSubscription`;
+        const apiUrl = `${process.env.VUE_APP_BASE_URL}/wp-admin/admin-ajax.php?action=resumeSubscription`;
         const response = await fetch(apiUrl, {
           method: "POST",
         });
