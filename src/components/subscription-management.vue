@@ -241,6 +241,7 @@ export default {
 
         if (data.success) {
           successMessage.value = data.message;
+          store.dispatch("fetchUserData");
           setTimeout(() => {
             closePopup();
           }, 2000);
