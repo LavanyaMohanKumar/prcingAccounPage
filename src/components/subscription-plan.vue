@@ -253,7 +253,7 @@
 </template>
 
 <script>
-import { computed, inject, ref } from "vue";
+import { computed, inject, ref, nextTick } from "vue";
 import { useStore } from "vuex";
 
 export default {
@@ -328,10 +328,8 @@ export default {
           customer_id: orderData.razorpay_customer_id,
           recurring: "1",
           handler: function (response) {
-            alert(
-              "Payment successful! Your order ID is " +
-                response.razorpay_order_id
-            );
+            console.log(response);
+            store.dispatch("fetchUserData");
           },
           notes: {
             "note_key 1": "Resubcription order",
@@ -394,6 +392,7 @@ export default {
         if (data.success) {
           store.commit("setNextPaymentDate", data.data);
           store.commit("setSubscriptionMessage", null);
+          await nextTick();
           subscriptionData.value.buttonText = null;
         } else {
           alert("Error: " + data.data);
