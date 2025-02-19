@@ -2,12 +2,24 @@
   <div class="payment-card">
     <div class="flex justify-between items-center payment-align">
       <span class="text-xl font-semibold">Auto - Debit</span>
-      <el-tag :class="isAutoPayEnabled ? 'enabled-tag' : 'disabled-tag'">
-        {{ isAutoPayEnabled ? "Enabled" : "Disabled" }}
+      <el-tag
+        :class="{
+          'enabled-tag': isAutoPayEnabled,
+          'disabled-tag': !isAutoPayEnabled && paymentMethod !== 'NotSet',
+          'not-set-tag': !isAutoPayEnabled && paymentMethod === 'NotSet',
+        }"
+      >
+        {{
+          isAutoPayEnabled
+            ? "Enabled"
+            : paymentMethod === "NotSet"
+            ? "Not-set"
+            : "Disabled"
+        }}
       </el-tag>
     </div>
 
-    <div class="info-row">
+    <div class="info-row" v-if="isAutoPayEnabled">
       <small class="text-gray-500">
         You will be intimated 24Hrs prior to debit
       </small>
@@ -45,10 +57,12 @@ export default {
     const paymentMethod = computed(() => {
       if (autoPay.value?.method === "card") {
         return autoPay.value?.network
-          ? autoPay.value?.network.toUpperCase()
+          ? autoPay.value.network.toUpperCase()
           : "CARD";
       } else if (autoPay.value?.method === "upi") {
         return "UPI";
+      } else if (autoPay.value?.method === "NotSet") {
+        return "NotSet";
       }
       return "N/A";
     });
@@ -168,5 +182,10 @@ export default {
 .disabled-tag {
   background-color: #ff3b3b !important;
   color: white;
+}
+
+.not-set-tag {
+  background-color: #f2f231 !important;
+  color: black;
 }
 </style>

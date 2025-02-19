@@ -260,7 +260,6 @@ export default {
   name: "SubscriptionCard",
   setup() {
     const userSubscription = inject("userSubscription");
-    const nextPaymentDate = ref(null);
     const couponCode = ref("");
     const showCouponInput = ref(false);
     const promoMessage = ref("");
@@ -268,7 +267,7 @@ export default {
     const errorMessage = ref("");
     const couponApplied = ref(false);
     const savedCouponCode = ref(null);
-
+    const nextPaymentDate = computed(() => store.state.nextPaymentDate);
     const toggleCoupon = () => {
       showCouponInput.value = !showCouponInput.value;
     };
@@ -405,9 +404,9 @@ export default {
         });
         const data = await response.json();
         if (data.success) {
-          nextPaymentDate.value = data.data;
           store.commit("setNextPaymentDate", data.data);
           store.commit("setSubscriptionMessage", null);
+          subscriptionData.value.buttonText = null;
         } else {
           alert("Error: " + data.data);
         }
@@ -426,6 +425,7 @@ export default {
       promoMessage,
       buttonText,
       errorMessage,
+      nextPaymentDate,
       applyCoupon,
       couponApplied,
       removeCoupon,

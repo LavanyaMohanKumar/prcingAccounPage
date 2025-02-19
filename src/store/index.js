@@ -23,12 +23,13 @@ export default createStore({
         console.warn("SET_USER_DATA received invalid data:", data);
       }
     },
+
     SET_SUBSCRIPTION_MESSAGE(state, message) {
-      state.subscriptionMessage = message;
+      state.subscriptionMessage = message || null;  
     },
     setNextPaymentDate(state, date) {
       state.nextPaymentDate = date;
-    },
+    }    
   },
   actions: {
     async fetchUserData({ commit }) {
