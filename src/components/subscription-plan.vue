@@ -345,13 +345,10 @@ export default {
       }
       try {
         const apiUrl = `${process.env.VUE_APP_BASE_URL}/wp-admin/admin-ajax.php?action=check_subscription_coupon&coupon_code=${couponCode.value}`;
-
         const response = await fetch(apiUrl, {
           method: "POST",
         });
-
         const data = await response.json();
-
         if (data.success) {
           savedCouponCode.value = couponCode.value;
           promoMessage.value = data.data.promoInfo;
@@ -390,7 +387,6 @@ export default {
           store.commit("setNextPaymentDate", data.data);
           store.commit("setSubscriptionMessage", null);
           subscriptionData.value.buttonText = null;
-          store.dispatch("fetchUserData");
         } else {
           alert("Error: " + data.data);
         }

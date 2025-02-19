@@ -38,7 +38,9 @@
           <small class="font-medium">Payment Method</small>
           <div class="card-info-row">
             <span class="card-number">{{ maskedPaymentInfo }}</span>
-            <button class="change-method-button">Change payment method</button>
+            <button class="change-method-button" @click="changePaymentMethod">
+              Change payment method
+            </button>
           </div>
         </div>
       </div>
@@ -48,12 +50,13 @@
 
 <script>
 import { computed, inject, ref } from "vue";
-
+import { useStore } from "vuex";
 export default {
   setup() {
     const autoPay = inject("autoPay");
     const showCardDetails = ref(false);
     const isAutoPayEnabled = computed(() => autoPay.value?.status);
+    const store = useStore();
     const paymentMethod = computed(() => {
       if (autoPay.value?.method === "card") {
         return autoPay.value?.network
@@ -66,6 +69,47 @@ export default {
       }
       return "N/A";
     });
+    const changePaymentMethod = async () => {
+      if (!autoPay.value?.method) {
+        alert("No payment method available.");
+        return;
+      }
+      const apiUrl = `${process.env.VUE_APP_BASE_URL}/wp-admin/admin-ajax.php?action=change_payment_method&payment_option=${autoPay.method}`;
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+        const data = await response.json();
+        if (data.success) {
+          openRazorpayPopup(data.data);
+        } else {
+          alert("Error: " + data.data);
+        }
+      } catch (error) {
+        alert("An error occurred. Please try again.");
+      }
+    };
+    const openRazorpayPopup = async (paymentData) => {
+      try {
+        const options = {
+          key: paymentData.razorpay_order_key,
+          order_id: paymentData.razorpay_order_id,
+          customer_id: paymentData.razorpay_customer_id,
+          recurring: "1",
+          handler: function () {
+            store.dispatch("fetchUserData");
+          },
+          notes: {
+            "note_key 1": "Resubcription order",
+          },
+        };
+        var razorpay = new Razorpay(options);
+        razorpay.open();
+      } catch (error) {
+        console.error("Error loading Razorpay script:", error);
+      }
+    };
     const maskedPaymentInfo = computed(() => {
       if (autoPay.value?.method === "upi") {
         return autoPay.value?.upi || "Not Available";
@@ -84,6 +128,8 @@ export default {
       isAutoPayEnabled,
       paymentMethod,
       maskedPaymentInfo,
+      changePaymentMethod,
+      openRazorpayPopup,
     };
   },
 };

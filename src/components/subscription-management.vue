@@ -66,7 +66,9 @@
             </label>
           </div>
         </div>
-
+        <div v-if="successMessage" class="text-success">
+          {{ successMessage }}
+        </div>
         <div class="button-group">
           <button class="back-button" @click="closePopup">Back</button>
 
@@ -177,6 +179,8 @@ import { inject, ref, watch, onMounted, computed } from "vue";
 export default {
   setup(props, { emit }) {
     const userSubscription = inject("userSubscription");
+    const successMessage = ref("");
+    const showBillingPopup = ref(false);
     const billingVariations = {
       quarterly: process.env.VUE_APP_SUBSCRIPTION_QUARTERLY,
       annually: process.env.VUE_APP_SUBSCRIPTION_ANNUALLY,
@@ -194,7 +198,15 @@ export default {
         currentBillingOption.value = "annually";
       }
     };
+    const closePopup = () => {
+      showBillingPopup.value = false;
+      emit("closePopup");
+    };
 
+    const openBillingPopup = () => {
+      showBillingPopup.value = true;
+      successMessage.value = "";
+    };
     watch(
       () => props.showBillingPopup,
       (newVal) => {
@@ -217,10 +229,8 @@ export default {
     };
     const switchBillingCycle = async () => {
       if (!isOptionChanged.value) return;
-
       const newVariationId = billingVariations[selectedOption.value];
       const apiUrl = `${process.env.VUE_APP_BASE_URL}/wp-admin/admin-ajax.php?action=prime_switch_billing_cycle&new_variation_id=${newVariationId}`;
-
       try {
         const response = await fetch(apiUrl, {
           method: "POST",
@@ -230,8 +240,10 @@ export default {
         const data = await response.json();
 
         if (data.success) {
-          emit("billingUpdated");
-          emit("closePopup");
+          successMessage.value = data.message;
+          setTimeout(() => {
+            closePopup();
+          }, 2000);
         } else {
           alert(data.data.message);
         }
@@ -247,33 +259,28 @@ export default {
       selectOption,
       selectedOption,
       isOptionChanged,
+      successMessage,
+      closePopup,
+      showBillingPopup,
+      openBillingPopup,
     };
   },
   data() {
     return {
       isOpen: false,
-      showBillingPopup: false,
       showCancelPopup: false,
       showFinalPopup: false,
-
       showInitialPopup: false,
       showReasonPopup: false,
       selectedReason: null,
       otherReasonText: null,
-      successMessage: null,
     };
   },
   methods: {
     toggleSubscription() {
       this.isOpen = !this.isOpen;
     },
-    closePopup() {
-      this.showBillingPopup = false;
-      this.$emit("closePopup");
-    },
-    openBillingPopup() {
-      this.showBillingPopup = true;
-    },
+
     autoResize(event) {
       const textarea = event.target;
       textarea.style.height = "auto";
@@ -317,7 +324,6 @@ export default {
       });
       const data = await response.json();
       if (data.success) {
-        alert(data.data);
         this.closeReasonPopup();
         setTimeout(() => {
           this.store.commit("SET_SUBSCRIPTION_MESSAGE", data.data);
