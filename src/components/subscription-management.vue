@@ -30,7 +30,7 @@
     <div v-if="showBillingPopup" class="popup-overlay" @click.self="closePopup">
       <div class="popup-container">
         <div class="popup-header">
-          <h2>Choose billing period</h2>
+          <h3>Choose billing period</h3>
           <button class="close-button" @click="closePopup">✖</button>
         </div>
 

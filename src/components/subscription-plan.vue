@@ -295,7 +295,6 @@ export default {
         const data = await response.json();
 
         if (data.success) {
-          promoMessage.value = data.data.message;
           openRazorpayPopup(data.data);
         } else {
           console.error("Subscription renewal failed", data.data.message);
@@ -327,8 +326,7 @@ export default {
           order_id: orderData.razorpay_order_id,
           customer_id: orderData.razorpay_customer_id,
           recurring: "1",
-          handler: function (response) {
-            console.log(response);
+          handler: function () {
             store.dispatch("fetchUserData");
           },
           notes: {
@@ -392,8 +390,8 @@ export default {
         if (data.success) {
           store.commit("setNextPaymentDate", data.data);
           store.commit("setSubscriptionMessage", null);
-          await nextTick();
           subscriptionData.value.buttonText = null;
+          await nextTick();
         } else {
           alert("Error: " + data.data);
         }
