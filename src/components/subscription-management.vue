@@ -66,7 +66,11 @@
 
         <div class="button-group">
           <button class="back-button" @click="closePopup">Back</button>
-          <button class="proceed-button" :disabled="!selectedOption">
+          <button
+            class="proceed-button"
+            :disabled="!isOptionChanged"
+            @click="switchBillingCycle"
+          >
             Proceed
           </button>
         </div>
@@ -165,11 +169,86 @@
 </template>
 
 <script>
-import { useStore } from "vuex";
+import { inject, ref, watch, onMounted, computed } from "vue";
 export default {
-  setup() {
-    const store = useStore();
-    return { store };
+  setup(props, { emit }) {
+    const userSubscription = inject("userSubscription");
+    const billingVariations = {
+      quarterly: process.env.SUBSCRIPTION_QUARTERLY || "198169",
+      annual: process.env.SUBSCRIPTION_ANNUAL || "198211",
+    };
+    const selectedOption = ref(null);
+    const currentBillingOption = ref(null);
+    const setInitialOption = () => {
+      const currentBillingId =
+        userSubscription?.value?.userCurrentbillingMethod;
+      if (currentBillingId === billingVariations.quarterly) {
+        selectedOption.value = "quarterly";
+        currentBillingOption.value = "quarterly";
+      } else if (currentBillingId === billingVariations.monthly) {
+        selectedOption.value = "monthly";
+        currentBillingOption.value = "monthly";
+      }
+    };
+
+    watch(
+      () => props.showBillingPopup,
+      (newVal) => {
+        if (newVal) {
+          setInitialOption();
+        }
+      }
+    );
+
+    onMounted(() => {
+      setInitialOption();
+    });
+
+    const isOptionChanged = computed(
+      () => selectedOption.value !== currentBillingOption.value
+    );
+
+    const selectOption = (option) => {
+      selectedOption.value = option;
+    };
+
+    const switchBillingCycle = async () => {
+      if (!isOptionChanged.value) return;
+
+      const newVariationId = billingVariations[selectedOption.value];
+      const apiUrl = `${process.env.VUE_APP_BASE_URL}wp-admin/admin-ajax.php?action=prime_switch_billing_cycle&new_variation_id=${newVariationId}`;
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          emit("billingUpdated");
+          emit("closePopup");
+        } else {
+          alert(data.data.message);
+        }
+      } catch (error) {
+        alert("An error occurred. Please try again.");
+      }
+    };
+
+    const closePopup = () => {
+      emit("closePopup");
+    };
+
+    return {
+      userSubscription,
+      switchBillingCycle,
+      selectOption,
+      selectedOption,
+      closePopup,
+      isOptionChanged,
+    };
   },
   data() {
     return {
@@ -177,7 +256,7 @@ export default {
       showBillingPopup: false,
       showCancelPopup: false,
       showFinalPopup: false,
-      selectedOption: null,
+
       showInitialPopup: false,
       showReasonPopup: false,
       selectedReason: null,
@@ -197,14 +276,7 @@ export default {
       textarea.style.height = "auto";
       textarea.style.height = textarea.scrollHeight + "px";
     },
-    closePopup() {
-      this.showBillingPopup = false;
-      this.showCancelPopup = false;
-      this.showFinalPopup = false;
-    },
-    selectOption(option) {
-      this.selectedOption = option;
-    },
+
     confirmCancellation() {
       this.showCancelPopup = false;
       this.showFinalPopup = true;
@@ -222,6 +294,7 @@ export default {
     closeReasonPopup() {
       this.showReasonPopup = false;
     },
+
     async cancelSubscription() {
       if (!this.selectedReason) {
         alert("Please select a reason for cancellation.");
@@ -397,9 +470,9 @@ input[type="radio"] {
 }
 
 .back-button {
-  background: white;
-  border: 1px solid #007bff;
-  color: #007bff;
+  background: transparent;
+  border: 1px solid black;
+  color: black;
   padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
@@ -407,7 +480,7 @@ input[type="radio"] {
 }
 
 .proceed-button {
-  background: #007bff;
+  background: #00a3d9;
   color: white;
   border: none;
   padding: 8px 16px;

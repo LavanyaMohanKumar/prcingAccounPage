@@ -297,7 +297,6 @@ export default {
         if (data.success) {
           openRazorpayPopup(data.data);
         } else {
-          console.error("Subscription renewal failed", data.data.message);
           promoMessage.value = data.data.message;
         }
       } catch (error) {
@@ -326,15 +325,15 @@ export default {
           order_id: orderData.razorpay_order_id,
           customer_id: orderData.razorpay_customer_id,
           recurring: "1",
+          handler: function () {
+            store.dispatch("fetchUserData");
+          },
           notes: {
             "note_key 1": "Resubcription order",
           },
         };
         var razorpay = new Razorpay(options);
         razorpay.open();
-        razorpay.on("payment.success", function () {
-          store.dispatch("fetchUserData");
-        });
       } catch (error) {
         console.error("Error loading Razorpay script:", error);
       }
@@ -389,7 +388,8 @@ export default {
         const data = await response.json();
         if (data.success) {
           store.commit("setNextPaymentDate", data.data);
-          store.dispatch("fetchUserData");
+          store.commit("setSubscriptionMessage", null);
+          subscriptionData.value.buttonText = null;
         } else {
           alert("Error: " + data.data);
         }

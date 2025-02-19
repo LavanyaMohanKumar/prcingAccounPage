@@ -11,7 +11,7 @@ import 'bootstrap-vue-next/dist/bootstrap-vue-next.css';
 
 import store from './store/index.js';
 
-import { BContainer, BRow, BCol,BTable, BButton } from 'bootstrap-vue-next';                  
+import { BContainer, BRow, BCol,BTable, BButton, BSpinner } from 'bootstrap-vue-next';                  
 
 const app = createApp(App);
 
@@ -20,6 +20,7 @@ app.component('BRow', BRow);
 app.component('BCol', BCol);
 app.component("BTable", BTable);
 app.component("BButton", BButton);
+app.component("BSpinner", BSpinner);
 
 app.use(ElementPlus);
 app.use(vuetify);

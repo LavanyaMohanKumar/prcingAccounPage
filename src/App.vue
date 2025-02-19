@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <b-container fluid>
+    <b-row class="justify-content-center" v-if="loading">
+      <b-spinner label="Loading..." variant="primary" class="my-4"></b-spinner>
+    </b-row>
+    <b-container v-else fluid>
       <h3>My Account</h3>
       <b-row class="mb-3">
         <b-col cols="12" md="8" lg="6">
@@ -37,7 +40,7 @@
 </template>
 
 <script>
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
 import { computed, provide } from "vue";
 
@@ -59,8 +62,15 @@ export default {
   },
   setup() {
     const store = useStore();
+    const loading = ref(true);
     onMounted(async () => {
-      store.dispatch("fetchUserData");
+      try {
+        await store.dispatch("fetchUserData");
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        loading.value = false;
+      }
     });
     const userProfile = computed(() => store.getters.userProfile);
     const userKyc = computed(() => store.getters.userKyc);
@@ -74,7 +84,7 @@ export default {
     provide("billingHistory", billingHistory);
     provide("autoPay", autoPay);
 
-    return {};
+    return { loading };
   },
 };
 </script>
