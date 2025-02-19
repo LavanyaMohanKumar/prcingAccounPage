@@ -253,7 +253,7 @@
 </template>
 
 <script>
-import { computed, inject, ref, nextTick } from "vue";
+import { computed, inject, ref } from "vue";
 import { useStore } from "vuex";
 
 export default {
@@ -326,15 +326,15 @@ export default {
           order_id: orderData.razorpay_order_id,
           customer_id: orderData.razorpay_customer_id,
           recurring: "1",
-          handler: function () {
-            store.dispatch("fetchUserData");
-          },
           notes: {
             "note_key 1": "Resubcription order",
           },
         };
         var razorpay = new Razorpay(options);
         razorpay.open();
+        razorpay.on("payment.success", function () {
+          store.dispatch("fetchUserData");
+        });
       } catch (error) {
         console.error("Error loading Razorpay script:", error);
       }
@@ -389,9 +389,7 @@ export default {
         const data = await response.json();
         if (data.success) {
           store.commit("setNextPaymentDate", data.data);
-          store.commit("setSubscriptionMessage", null);
-          subscriptionData.value.buttonText = null;
-          await nextTick();
+          store.dispatch("fetchUserData");
         } else {
           alert("Error: " + data.data);
         }
