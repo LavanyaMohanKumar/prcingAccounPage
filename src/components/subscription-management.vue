@@ -77,7 +77,7 @@
             :disabled="!isOptionChanged"
             @click="switchBillingCycle"
           >
-            Proceed
+            Switch
           </button>
         </div>
       </div>
@@ -176,11 +176,13 @@
 
 <script>
 import { inject, ref, watch, onMounted, computed } from "vue";
+import { useStore } from "vuex";
 export default {
   setup(props, { emit }) {
     const userSubscription = inject("userSubscription");
     const successMessage = ref("");
     const showBillingPopup = ref(false);
+    const store = useStore();
     const billingVariations = {
       quarterly: process.env.VUE_APP_SUBSCRIPTION_QUARTERLY,
       annually: process.env.VUE_APP_SUBSCRIPTION_ANNUALLY,
