@@ -79,7 +79,7 @@ export default {
     const profileImage = ref(require("@/assets/images/Profile.jpg"));
     const store = useStore();
     const computedProfileImage = computed(() => {
-      return userProfile?.userImage || profileImage.value;
+      return store.state.userProfile?.image || profileImage.value;
     });
 
     const userProfile = inject("userProfile");
