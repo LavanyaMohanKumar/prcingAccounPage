@@ -183,6 +183,26 @@ export default {
     const successMessage = ref("");
     const showBillingPopup = ref(false);
     const selectedReason = ref(null);
+    const showReasonPopup = ref(false);
+    const showInitialPopup = ref(false);
+
+    const showNextPopup = () => {
+      showInitialPopup.value = false;
+      showReasonPopup.value = true;
+    };
+
+    const closeReasonPopup = () => {
+      showReasonPopup.value = false;
+    };
+
+    const openCancelPopup = () => {
+      showInitialPopup.value = true;
+    };
+
+    const closeInitialPopup = () => {
+      showInitialPopup.value = false;
+    };
+
     const otherReasonText = ref("");
     const store = useStore();
     const billingVariations = {
@@ -252,6 +272,7 @@ export default {
         if (data.success) {
           setTimeout(() => {
             store.commit("SET_SUBSCRIPTION_MESSAGE", data.data);
+            showReasonPopup.value = false;
           }, 300);
         } else {
           alert("Error: " + data.data);
@@ -282,6 +303,7 @@ export default {
           }, 2000);
         } else {
           alert(data.data.message);
+          closePopup();
         }
       } catch (error) {
         alert("An error occurred. Please try again.");
@@ -302,44 +324,22 @@ export default {
       otherReasonText,
       openBillingPopup,
       cancelSubscription,
+      showNextPopup,
+      closeReasonPopup,
+      showInitialPopup,
+      openCancelPopup,
+      closeInitialPopup,
+      showReasonPopup,
     };
   },
   data() {
     return {
       isOpen: false,
-      showCancelPopup: false,
-      showFinalPopup: false,
-      showInitialPopup: false,
-      showReasonPopup: false,
     };
   },
   methods: {
     toggleSubscription() {
       this.isOpen = !this.isOpen;
-    },
-
-    autoResize(event) {
-      const textarea = event.target;
-      textarea.style.height = "auto";
-      textarea.style.height = textarea.scrollHeight + "px";
-    },
-
-    confirmCancellation() {
-      this.showCancelPopup = false;
-      this.showFinalPopup = true;
-    },
-    openCancelPopup() {
-      this.showInitialPopup = true;
-    },
-    closeInitialPopup() {
-      this.showInitialPopup = false;
-    },
-    showNextPopup() {
-      this.showInitialPopup = false;
-      this.showReasonPopup = true;
-    },
-    closeReasonPopup() {
-      this.showReasonPopup = false;
     },
   },
 };
