@@ -24,6 +24,14 @@ export default createStore({
       }
     },
 
+    SET_USER_PROFILE_IMAGE(state, imageUrl) {
+      if (state.userProfile) {
+        state.userProfile.image = imageUrl; 
+      } else {
+        state.userProfile = { image: imageUrl }; 
+      }
+    },
+    
     SET_SUBSCRIPTION_MESSAGE(state, message) {
       state.subscriptionMessage = message;  
     },

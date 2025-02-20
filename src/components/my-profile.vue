@@ -114,15 +114,13 @@ export default {
       () => store.state.userProfile.userImage,
       (newImage) => {
         if (newImage) {
-          userProfile.value.userImage = newImage; // Manually update reactivity
+          userProfile.value.userImage = newImage;
         }
       }
     );
-    // Upload Image to Backend
     const uploadImage = async (formData) => {
       const baseURL = process.env.VUE_APP_BASE_URL;
       const action = "dashboard_userProfile_image";
-
       try {
         const response = await fetch(
           `${baseURL}/wp-admin/admin-ajax.php?action=${action}`,
@@ -131,13 +129,9 @@ export default {
             body: formData,
           }
         );
-
         const result = await response.json();
-        console.log(result);
-
         if (result.success) {
           store.commit("SET_USER_PROFILE_IMAGE", result.data.url);
-          console.log("Image uploaded successfully:", result.data);
         } else {
           console.error("Upload failed:", result.data.message);
         }
@@ -157,6 +151,7 @@ export default {
       closeNameDialog,
       computedProfileImage,
       handleFileUpload,
+      uploadImage,
     };
   },
 };

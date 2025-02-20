@@ -46,7 +46,7 @@
             <label class="option-label">
               <div class="option-content">
                 <span>Quarterly billing</span>
-                <span class="price">₹ 1,999 per quarter</span>
+                <span class="price">₹ 2,499 per quarter</span>
               </div>
               <input type="radio" v-model="selectedOption" value="quarterly" />
             </label>
@@ -60,7 +60,7 @@
             <label class="option-label">
               <div class="option-content">
                 <span>annually billing</span>
-                <span class="price">₹ 999 per month</span>
+                <span class="price">₹ 7,999 per month</span>
               </div>
               <input type="radio" v-model="selectedOption" value="annually" />
             </label>
