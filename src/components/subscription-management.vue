@@ -294,10 +294,12 @@ export default {
       switchBillingCycle,
       selectOption,
       selectedOption,
+      selectedReason,
       isOptionChanged,
       successMessage,
       closePopup,
       showBillingPopup,
+      otherReasonText,
       openBillingPopup,
       cancelSubscription,
     };
@@ -309,8 +311,6 @@ export default {
       showFinalPopup: false,
       showInitialPopup: false,
       showReasonPopup: false,
-      selectedReason: null,
-      otherReasonText: null,
     };
   },
   methods: {

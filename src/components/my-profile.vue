@@ -4,7 +4,7 @@
       <div class="profile-container">
         <label for="imageUpload" class="upload-label">
           <img
-            :src="userProfile?.userImage || profileImage"
+            :src="computedProfileImage"
             alt="Profile Picture"
             class="dashboard-avatar-img"
           />
@@ -12,7 +12,16 @@
           <span class="edit-icon">
             <img src="@/assets/images/edit.svg" alt="Edit" />
           </span>
+
+          <input
+            type="file"
+            id="imageUpload"
+            @change="handleFileUpload"
+            accept="image/*"
+            hidden
+          />
         </label>
+
         <input
           type="file"
           id="imageUpload"
@@ -63,11 +72,16 @@
 </template>
 
 <script>
-import { ref, computed, inject } from "vue";
-
+import { ref, computed, inject, watch } from "vue";
+import { useStore } from "vuex";
 export default {
   setup() {
     const profileImage = ref(require("@/assets/images/Profile.jpg"));
+    const store = useStore();
+    const computedProfileImage = computed(() => {
+      return userProfile?.userImage || profileImage.value;
+    });
+
     const userProfile = inject("userProfile");
     const userName = computed(() => userProfile.value?.userName || "");
     const userEmail = computed(() => userProfile.value?.userEmail || "");
@@ -88,6 +102,49 @@ export default {
       showNameDialog.value = false;
     };
 
+    const handleFileUpload = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append("image", file);
+        uploadImage(formData);
+      }
+    };
+    watch(
+      () => store.state.userProfile.userImage,
+      (newImage) => {
+        if (newImage) {
+          userProfile.value.userImage = newImage; // Manually update reactivity
+        }
+      }
+    );
+    // Upload Image to Backend
+    const uploadImage = async (formData) => {
+      const baseURL = process.env.VUE_APP_BASE_URL;
+      const action = "dashboard_userProfile_image";
+
+      try {
+        const response = await fetch(
+          `${baseURL}/wp-admin/admin-ajax.php?action=${action}`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        const result = await response.json();
+        console.log(result);
+
+        if (result.success) {
+          store.commit("SET_USER_PROFILE_IMAGE", result.data.url);
+          console.log("Image uploaded successfully:", result.data);
+        } else {
+          console.error("Upload failed:", result.data.message);
+        }
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
+    };
     return {
       userProfile,
       userName,
@@ -98,6 +155,8 @@ export default {
       tempName,
       openNameDialog,
       closeNameDialog,
+      computedProfileImage,
+      handleFileUpload,
     };
   },
 };
