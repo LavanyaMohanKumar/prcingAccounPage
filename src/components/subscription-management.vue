@@ -270,8 +270,8 @@ export default {
         const response = await fetch(apiUrl, { method: "POST" });
         const data = await response.json();
         if (data.success) {
+          store.dispatch("fetchUserData");
           setTimeout(() => {
-            store.commit("SET_SUBSCRIPTION_MESSAGE", data.data);
             showReasonPopup.value = false;
           }, 300);
         } else {
