@@ -40,7 +40,8 @@
     <el-dialog
       v-model="showPanPopup"
       title="Enter PAN Details"
-      width="400px"
+      width="500px"
+      class="custom-close-btn"
       center
     >
       <el-form>
@@ -53,24 +54,23 @@
             @input="validatePAN"
           />
         </el-form-item>
-        <el-form-item
-          label="Date of Birth"
-          :error="dobError"
-          class="flex-grow-1"
-        >
-          <el-date-picker
+
+        <el-form-item label="Date of Birth" :error="dobError">
+          <input
             v-model="dob"
-            class="w-100 custom-date-picker"
-            placeholder="Select Date of Birth"
             type="date"
-            @change="validateDOB"
+            class="w-100 form-control"
+            @input="validateDOB"
           />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="showPanPopup = false">Cancel</el-button>
-        <el-button type="primary" @click="submitPAN" :disabled="!isFormValid"
-          >Submit</el-button
+        <el-button
+          @click="submitPAN"
+          class="proceed-button"
+          :disabled="!isFormValid"
+          >Fetch</el-button
         >
       </template>
     </el-dialog>
@@ -78,7 +78,7 @@
 </template>
 
 <script>
-import { computed, ref, inject } from "vue";
+import { computed, ref, inject, watch } from "vue";
 
 export default {
   setup() {
@@ -123,7 +123,15 @@ export default {
         isFormValid.value = false;
       }
     };
-
+    watch(showPanPopup, (newValue) => {
+      if (!newValue) {
+        panNumber.value = "";
+        dob.value = "";
+        panError.value = "";
+        dobError.value = "";
+        isFormValid.value = false;
+      }
+    });
     const submitPAN = async () => {
       if (!isFormValid.value) {
         return;
@@ -132,7 +140,7 @@ export default {
         ? new Date(dob.value).toISOString().split("T")[0]
         : "";
       try {
-        const apiUrl = `${process.env.VUE_APP_BASE_URL}/wp-admin/admin-ajax.php?action=verify_kyc_with_pan_callback&pan=${panNumber.value}&cus_dob=${formattedDOB}`;
+        const apiUrl = `${process.env.VUE_APP_BASE_URL}/wp-admin/admin-ajax.php?action=verify_kyc_with_pan&pan=${panNumber.value}&cus_dob=${formattedDOB}`;
         const response = await fetch(apiUrl, {
           method: "POST",
         });
@@ -218,18 +226,23 @@ export default {
   padding: 9px 20px;
 }
 
-::v-deep(
-    .custom-date-picker .el-input__prefix .el-input__prefix-inner .el-icon
-  ) {
-  margin-left: auto !important; /* Moves it to the right */
-  order: 2;
+::v-deep(.custom-close-btn .el-dialog__headerbtn) {
+  background-color: transparent;
 }
 
-::v-deep(.custom-date-picker .el-input__suffix .el-input__suffix-inner) {
-  position: absolute;
-  right: 10px !important;
-  left: auto !important;
-  display: flex;
-  align-items: center;
+::v-deep(.custom-close-btn .el-dialog__headerbtn:hover) {
+  background-color: transparent;
+}
+
+.proceed-button {
+  background: #00a3d9;
+  color: white;
+  border: 1 px solid black;
+  cursor: pointer;
+}
+
+.proceed-button:hover {
+  background: #00a3d9;
+  color: white;
 }
 </style>
