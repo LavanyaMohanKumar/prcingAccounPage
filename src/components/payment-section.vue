@@ -92,6 +92,7 @@ export default {
     };
     const openRazorpayPopup = async (paymentData) => {
       try {
+        await loadRazorpayScript();
         const options = {
           key: paymentData.razorpay_order_key,
           order_id: paymentData.razorpay_order_id,
@@ -109,6 +110,19 @@ export default {
       } catch (error) {
         console.error("Error loading Razorpay script:", error);
       }
+    };
+    const loadRazorpayScript = () => {
+      return new Promise((resolve, reject) => {
+        if (typeof Razorpay !== "undefined") {
+          resolve();
+        } else {
+          const script = document.createElement("script");
+          script.src = "https://checkout.razorpay.com/v1/checkout.js";
+          script.onload = () => resolve();
+          script.onerror = () => reject("Razorpay script failed to load");
+          document.body.appendChild(script);
+        }
+      });
     };
     const maskedPaymentInfo = computed(() => {
       if (autoPay.value?.method === "upi") {

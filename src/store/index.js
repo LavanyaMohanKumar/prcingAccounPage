@@ -25,7 +25,7 @@ export default createStore({
     },
 
     SET_SUBSCRIPTION_MESSAGE(state, message) {
-      state.subscriptionMessage = message || null;  
+      state.subscriptionMessage = message;  
     },
     setNextPaymentDate(state, date) {
       state.nextPaymentDate = date;

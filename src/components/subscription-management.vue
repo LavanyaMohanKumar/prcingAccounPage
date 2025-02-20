@@ -182,6 +182,8 @@ export default {
     const userSubscription = inject("userSubscription");
     const successMessage = ref("");
     const showBillingPopup = ref(false);
+    const selectedReason = ref(null);
+    const otherReasonText = ref("");
     const store = useStore();
     const billingVariations = {
       quarterly: process.env.VUE_APP_SUBSCRIPTION_QUARTERLY,
@@ -229,6 +231,36 @@ export default {
     const selectOption = (option) => {
       selectedOption.value = option;
     };
+
+    const cancelSubscription = async () => {
+      if (!selectedReason.value) {
+        alert("Please select a reason for cancellation.");
+        return;
+      }
+      const cancelReason =
+        selectedReason.value === "others"
+          ? otherReasonText.value
+          : selectedReason.value;
+      const apiUrl = `${
+        process.env.VUE_APP_BASE_URL
+      }/wp-admin/admin-ajax.php?action=cancelSubscription&cancel_reason=${encodeURIComponent(
+        cancelReason
+      )}`;
+      try {
+        const response = await fetch(apiUrl, { method: "POST" });
+        const data = await response.json();
+        if (data.success) {
+          setTimeout(() => {
+            store.commit("SET_SUBSCRIPTION_MESSAGE", data.data);
+          }, 300);
+        } else {
+          alert("Error: " + data.data);
+        }
+      } catch (error) {
+        console.error("API Error:", error);
+      }
+    };
+
     const switchBillingCycle = async () => {
       if (!isOptionChanged.value) return;
       const newVariationId = billingVariations[selectedOption.value];
@@ -246,6 +278,7 @@ export default {
           store.dispatch("fetchUserData");
           setTimeout(() => {
             closePopup();
+            setInitialOption();
           }, 2000);
         } else {
           alert(data.data.message);
@@ -266,6 +299,7 @@ export default {
       closePopup,
       showBillingPopup,
       openBillingPopup,
+      cancelSubscription,
     };
   },
   data() {
@@ -306,34 +340,6 @@ export default {
     },
     closeReasonPopup() {
       this.showReasonPopup = false;
-    },
-
-    async cancelSubscription() {
-      if (!this.selectedReason) {
-        alert("Please select a reason for cancellation.");
-        return;
-      }
-      const cancelReason =
-        this.selectedReason === "others"
-          ? this.otherReasonText
-          : this.selectedReason;
-      const apiUrl = `${
-        process.env.VUE_APP_BASE_URL
-      }/wp-admin/admin-ajax.php?action=cancelSubscription&cancel_reason=${encodeURIComponent(
-        cancelReason
-      )}`;
-      const response = await fetch(apiUrl, {
-        method: "POST",
-      });
-      const data = await response.json();
-      if (data.success) {
-        this.closeReasonPopup();
-        setTimeout(() => {
-          this.store.commit("SET_SUBSCRIPTION_MESSAGE", data.data);
-        }, 500);
-      } else {
-        alert("Error: " + data.data);
-      }
     },
   },
 };
